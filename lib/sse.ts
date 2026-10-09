@@ -4,6 +4,7 @@ export async function streamGenerate(opts: {
   question: string;
   token: string;
   orgId: string;
+  dashboardId?: string;
   signal?: AbortSignal;
   onEvent: (e: StreamEvent) => void;
 }) {
@@ -14,7 +15,7 @@ export async function streamGenerate(opts: {
       'x-org-id': opts.orgId,
       'Content-Type': 'application/json',
     },
-    body: JSON.stringify({ question: opts.question }),
+        body: JSON.stringify({ question: opts.question, dashboardId: opts.dashboardId }),
     signal: opts.signal,
   });
 

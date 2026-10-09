@@ -16,8 +16,8 @@
   --color-s4: #4ec9b0;
   --color-s5: #ce9178;
   --color-s6: #569cd6;
-  --font-sans: var(--font-inter), system-ui, sans-serif;
-  --font-mono: var(--font-jetbrains), ui-monospace, monospace;
+  --font-sans: 'Inter Variable', system-ui, sans-serif;
+  --font-mono: 'JetBrains Mono Variable', ui-monospace, monospace;
 }
 
 html, body { background: var(--color-bg); color: var(--color-text); }
