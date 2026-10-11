@@ -1,8 +1,8 @@
-export function formatValue(v: unknown, format: 'currency' | 'number'): string {
+export function formatValue(v: unknown, format: 'currency' | 'number', currency = 'ETB'): string {
   const n = Number(v);
   if (!Number.isFinite(n)) return '—';
   const s = new Intl.NumberFormat('en-US', { maximumFractionDigits: 0 }).format(n);
-  return format === 'currency' ? `${s} ETB` : s;
+  return format === 'currency' ? `${s} ${currency}` : s;
 }
 
 export function compact(n: number): string {

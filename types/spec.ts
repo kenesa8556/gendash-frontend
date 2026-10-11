@@ -6,6 +6,7 @@ export type Row = Record<string, unknown>;
 export interface SpecPanel {
   id: string;
   kind: PanelKind;
+  currency?: string;
   label: string;
   queryId: string;
   format: 'currency' | 'number';

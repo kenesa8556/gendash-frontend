@@ -7,7 +7,7 @@ export function KpiCard({ panel, rows }: { panel: SpecPanel; rows: Row[] }) {
     <div className="flex flex-wrap gap-6">
       {entries.map(([k, v]) => (
         <div key={k}>
-          <p className="text-3xl font-semibold tabular-nums">{formatValue(v, panel.format)}</p>
+          <p className="text-3xl font-semibold tabular-nums">{formatValue(v, panel.format,panel.currency)}</p>
           <p className="text-xs text-muted mt-1 capitalize">{k}</p>
         </div>
       ))}

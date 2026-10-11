@@ -19,7 +19,7 @@ export function DataTable({ panel, rows }: { panel: SpecPanel; rows: Row[] }) {
             <tr key={i} className="border-b border-border/50">
               {cols.map((c) => (
                 <td key={c} className="py-2 pr-4 tabular-nums">
-                  {typeof r[c] === 'number' ? formatValue(r[c], panel.format) : String(r[c])}
+                  {typeof r[c] === 'number' ? formatValue(r[c], panel.format, panel.currency) : String(r[c])}
                 </td>
               ))}
             </tr>

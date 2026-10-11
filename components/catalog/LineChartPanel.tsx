@@ -18,7 +18,7 @@ export function LineChartPanel({ panel, rows }: { panel: SpecPanel; rows: Row[] 
             tickFormatter={(v) => compact(Number(v))} />
           <Tooltip
             contentStyle={{ background: 'var(--color-surface-2)', border: '1px solid var(--color-border)' }}
-            formatter={(v) => formatValue(v, panel.format)}
+            formatter={(v : unknown) => formatValue(v, panel.format, panel.currency)}
           />
           {keys.length > 1 && <Legend />}
           {keys.map((k, i) => (

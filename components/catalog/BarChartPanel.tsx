@@ -19,7 +19,7 @@ export function BarChartPanel({ panel, rows }: { panel: SpecPanel; rows: Row[] }
           <Tooltip
             cursor={{ fill: 'var(--color-surface-2)' }}
             contentStyle={{ background: 'var(--color-surface-2)', border: '1px solid var(--color-border)' }}
-            formatter={(v) => formatValue(v, panel.format)}
+            formatter={(v) => formatValue(v, panel.format,panel.currency)}
           />
           {keys.length > 1 && <Legend />}
           {keys.map((k, i) => (
