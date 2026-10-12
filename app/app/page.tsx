@@ -5,7 +5,7 @@ import { Bookmark, Loader2, LogOut, Trash2, X } from 'lucide-react';
 import { supabase } from '@/lib/supabase';
 import { useGeneration } from '@/hooks/useGeneration';
 import {
-  DashboardSummary, deleteDashboard, listDashboards, loadDashboard, saveDashboard,
+  DashboardSummary, deleteDashboard, listDashboards, loadDashboard, saveDashboard,getMe
 } from '@/lib/api';
 import { SPEC_VERSION } from '@/types/spec';
 import { SpecRenderer } from '@/components/renderer/SpecRenderer';
@@ -41,13 +41,14 @@ export default function AppPage() {
     (async () => {
       const { data } = await supabase.auth.getSession();
       if (!data.session) return router.replace('/login');
-      const { data: m, error } = await supabase
-        .from('members').select('org_id, organizations(name)');
-      if (error || !m?.length) return setSetupError(error?.message ?? 'No organization found');
-      const list = (m as any[]).map((x) => ({
-        id: x.org_id as string,
-        name: (x.organizations?.name ?? x.org_id) as string,
-      }));
+            let list: Org[];
+      try {
+        const me = await getMe();
+        if (!me.memberships.length) return router.replace('/onboarding');
+        list = me.memberships.map((x) => ({ id: x.orgId, name: x.name }));
+      } catch (e: any) {
+        return setSetupError(e.message);
+      }
       setOrgs(list);
       const savedOrg = localStorage.getItem('gendash.org');
       setOrgId(list.find((o) => o.id === savedOrg)?.id ?? list[0].id);

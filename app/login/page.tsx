@@ -1,5 +1,6 @@
 'use client';
 import { useState } from 'react';
+import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { supabase } from '@/lib/supabase';
 
@@ -32,6 +33,8 @@ export default function Login() {
         <button disabled={busy} className="w-full rounded bg-blue-600 p-2 disabled:opacity-50">
           {busy ? 'Signing in…' : 'Sign in'}
         </button>
+
+        <p className="text-sm text-muted">New here? <Link href="/signup" className="text-accent">Create an account</Link></p>
       </form>
     </main>
   );

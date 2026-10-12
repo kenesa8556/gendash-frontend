@@ -1,14 +1,14 @@
 import { supabase } from './supabase';
 import { Row, SpecPanel } from '@/types/spec';
 
-async function authFetch(path: string, orgId: string, init: RequestInit = {}): Promise<any> {
+async function authFetch(path: string, orgId: string | null, init: RequestInit = {}): Promise<any> {
   const { data } = await supabase.auth.getSession();
   if (!data.session) throw Object.assign(new Error('Please sign in again.'), { status: 401 });
   const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}${path}`, {
     ...init,
-    headers: {
+        headers: {
       Authorization: `Bearer ${data.session.access_token}`,
-      'x-org-id': orgId,
+      ...(orgId ? { 'x-org-id': orgId } : {}),
       'Content-Type': 'application/json',
       ...(init.headers ?? {}),
     },
@@ -73,3 +73,9 @@ export async function saveDashboard(runId: string, orgId: string, title?: string
     }
   }
 }
+export interface Membership { orgId: string; role: 'owner' | 'member'; name: string; currency: string }
+export interface Me { user: { id: string; email: string }; memberships: Membership[]; invitations: unknown[] }
+
+export const getMe = (): Promise<Me> => authFetch('/me', null);
+export const createOrganization = (name: string, currency: string): Promise<{ orgId: string; name: string; currency: string; role: string }> =>
+  authFetch('/organizations', null, { method: 'POST', body: JSON.stringify({ name, currency }) });
