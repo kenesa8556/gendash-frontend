@@ -74,8 +74,26 @@ export async function saveDashboard(runId: string, orgId: string, title?: string
   }
 }
 export interface Membership { orgId: string; role: 'owner' | 'member'; name: string; currency: string }
-export interface Me { user: { id: string; email: string }; memberships: Membership[]; invitations: unknown[] }
+export interface Me { user: { id: string; email: string }; memberships: Membership[]; invitations: Invitation[] }
 
 export const getMe = (): Promise<Me> => authFetch('/me', null);
 export const createOrganization = (name: string, currency: string): Promise<{ orgId: string; name: string; currency: string; role: string }> =>
   authFetch('/organizations', null, { method: 'POST', body: JSON.stringify({ name, currency }) });
+
+
+export interface Invitation { id: string; role: string; orgName: string; invitedBy: string; createdAt: string }
+export interface Member { user_id: string; email: string; role: 'owner' | 'member'; joined_at: string }
+export interface SentInvitation { id: string; email: string; role: string; status: string; created_at: string }
+
+export const listMembers = (orgId: string): Promise<Member[]> => authFetch('/members', orgId);
+export const listSentInvitations = (orgId: string): Promise<SentInvitation[]> => authFetch('/invitations', orgId);
+export const sendInvitation = (orgId: string, email: string) =>
+  authFetch('/invitations', orgId, { method: 'POST', body: JSON.stringify({ email }) });
+export const revokeInvitation = (orgId: string, id: string) =>
+  authFetch(`/invitations/${id}`, orgId, { method: 'DELETE' });
+export const setMemberRole = (orgId: string, userId: string, role: 'owner' | 'member') =>
+  authFetch(`/members/${userId}`, orgId, { method: 'PUT', body: JSON.stringify({ role }) });
+export const removeMember = (orgId: string, userId: string) =>
+  authFetch(`/members/${userId}`, orgId, { method: 'DELETE' });
+export const respondInvitation = (id: string, accept: boolean): Promise<{ accepted: boolean; orgId?: string }> =>
+  authFetch(`/invitations/${id}/respond`, null, { method: 'POST', body: JSON.stringify({ accept }) });
