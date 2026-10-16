@@ -102,30 +102,34 @@ export interface ImportPreview {
   filename: string; headers: string[]; totalRows: number; sample: string[][];
   mapping: Record<string, number | null>; missingRequired: string[];
   dateOrder: 'dmy' | 'mdy'; dateOrderAmbiguous: boolean;
+  sheets?: string[]; sheet?: string;
 }
 export interface ImportReport {
   dryRun?: boolean; rowsTotal: number; rowsValid: number; rowsSkipped: number;
-  reasons: Record<string, number>; issues: { line: number; reason: string }[];
+  reasons: Record<string, number>; issues: { line: number; reason: string; text: string }[];
   dateRange: { from: string; to: string } | null; sample: Record<string, unknown>[]; importId?: string;
 }
 export interface ImportRecord {
   id: string; filename: string; rows_imported: number; rows_skipped: number; mode: string; created_at: string;
 }
 
-export const previewImport = (orgId: string, file: File): Promise<ImportPreview> => {
+export const previewImport = (orgId: string, file: File, sheet?: string): Promise<ImportPreview> => {
   const f = new FormData();
   f.append('file', file);
+  if (sheet) f.append('sheet', sheet);
   return authFetch('/imports/preview', orgId, { method: 'POST', body: f });
 };
+
 export const runImport = (
   orgId: string, file: File, mapping: Record<string, number | null>,
-  o: { mode: 'append' | 'replace'; dateOrder: 'dmy' | 'mdy'; dryRun: boolean },
+  o: { mode: 'append' | 'replace'; dateOrder: 'dmy' | 'mdy'; dryRun: boolean; sheet?: string },
 ): Promise<ImportReport> => {
   const f = new FormData();
   f.append('file', file);
   f.append('mapping', JSON.stringify(mapping));
   f.append('mode', o.mode);
   f.append('dateOrder', o.dateOrder);
+  if (o.sheet) f.append('sheet', o.sheet);
   if (o.dryRun) f.append('dryRun', 'true');
   return authFetch('/imports', orgId, { method: 'POST', body: f });
 };

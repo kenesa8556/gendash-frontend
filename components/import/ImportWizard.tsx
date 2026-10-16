@@ -26,13 +26,14 @@ export function ImportWizard({ orgId, hasData, onDone }: { orgId: string; hasDat
   const [report, setReport] = useState<ImportReport | null>(null);
   const [busy, setBusy] = useState(false);
   const [err, setErr] = useState('');
+  const [sheet, setSheet] = useState('');
 
-  async function pick(f: File | undefined) {
+    async function pick(f: File | undefined) {
     if (!f) return;
     setErr('');
-    if (/\.xlsx?$/i.test(f.name))
-      return setErr('Excel files are coming soon. For now, open your sheet in Excel, choose File → Save As → CSV, and upload that.');
-    if (!/\.csv$/i.test(f.name)) return setErr('Please choose a .csv file.');
+    if (/\.xls$/i.test(f.name))
+      return setErr('Old .xls files are not supported. In Excel choose Save As → Excel Workbook (.xlsx), or save as CSV.');
+    if (!/\.(csv|xlsx)$/i.test(f.name)) return setErr('Please choose an Excel (.xlsx) or CSV file.');
     if (f.size > MAX_BYTES) return setErr('That file is larger than 5 MB.');
     setBusy(true);
     try {
@@ -41,7 +42,25 @@ export function ImportWizard({ orgId, hasData, onDone }: { orgId: string; hasDat
       setPreview(p);
       setMapping(p.mapping);
       setDateOrder(p.dateOrder);
+      setSheet(p.sheet ?? '');
       setStep('match');
+    } catch (e: any) {
+      setErr(e.message);
+    } finally {
+      setBusy(false);
+    }
+  }
+
+  async function changeSheet(name: string) {
+    if (!file) return;
+    setBusy(true);
+    setErr('');
+    try {
+      const p = await previewImport(orgId, file, name);
+      setPreview(p);
+      setMapping(p.mapping);
+      setDateOrder(p.dateOrder);
+      setSheet(p.sheet ?? name);
     } catch (e: any) {
       setErr(e.message);
     } finally {
@@ -57,7 +76,7 @@ export function ImportWizard({ orgId, hasData, onDone }: { orgId: string; hasDat
     setBusy(true);
     setErr('');
     try {
-      const r = await runImport(orgId, file!, mapping, { mode: hasData ? mode : 'append', dateOrder, dryRun });
+      const r = await runImport(orgId, file!, mapping, { mode: hasData ? mode : 'append', dateOrder, dryRun, sheet: sheet || undefined });
       setReport(r);
       if (dryRun) setStep('review');
       else {
@@ -92,13 +111,13 @@ export function ImportWizard({ orgId, hasData, onDone }: { orgId: string; hasDat
         <div className="space-y-3">
           <label className="flex cursor-pointer flex-col items-center gap-2 rounded-lg border border-dashed border-border p-8 text-center hover:bg-surface-2">
             {busy ? <Loader2 className="animate-spin" /> : <Upload />}
-            <span className="text-sm">Choose your sales file (.csv, up to 5 MB)</span>
-            <input type="file" accept=".csv,.xlsx,.xls" className="sr-only" disabled={busy}
+            <span className="text-sm">Choose your sales file (.xlsx or .csv, up to 5 MB)</span>
+            <input type="file" accept=".csv,.xlsx" className="sr-only" disabled={busy}
               onChange={(e) => { pick(e.target.files?.[0]); e.target.value = ''; }} />
           </label>
           <p className="text-xs text-muted">
             Needs at least a date and an amount for each sale. Branch, category, item and quantity are optional.
-            Using Excel? Choose File → Save As → CSV first.
+            Using an older .xls file? Choose Save As → Excel Workbook (.xlsx) first.
           </p>
         </div>
       )}
@@ -109,6 +128,17 @@ export function ImportWizard({ orgId, hasData, onDone }: { orgId: string; hasDat
             <span className="font-medium">{preview.filename}</span>: {preview.totalRows} rows found. Check that each item
             points at the right column in your file.
           </p>
+
+         {(preview.sheets?.length ?? 0) > 1 && (
+            <label className="flex flex-wrap items-center gap-3 text-sm">
+              <span className="w-28">Sheet</span>
+              <select value={sheet} disabled={busy} aria-label="Sheet" onChange={(e) => changeSheet(e.target.value)}
+                className="rounded border border-border bg-bg px-2 py-1">
+                {preview.sheets!.map((s) => <option key={s}>{s}</option>)}
+              </select>
+              <span className="text-xs text-muted">Which sheet has your sales?</span>
+            </label>
+          )}
           <div className="space-y-2">
             {FIELDS.map((f) => (
               <label key={f.key} className="flex flex-wrap items-center gap-3 text-sm">
@@ -174,10 +204,11 @@ export function ImportWizard({ orgId, hasData, onDone }: { orgId: string; hasDat
               <ul className="list-disc pl-5">
                 {Object.entries(report.reasons).map(([r, n]) => <li key={r}>{n} × {r}</li>)}
               </ul>
-              <p className="text-xs text-muted">
-                First problems (line numbers match your file, the header is line 1):{' '}
-                {report.issues.slice(0, 8).map((i) => `line ${i.line}`).join(', ')}
-              </p>
+                <ul className="list-disc pl-5 text-xs text-muted">
+                {report.issues.slice(0, 6).map((i, k) => (
+                  <li key={k}>{i.reason}: <span className="text-text">{i.text || '(empty row)'}</span></li>
+                ))}
+               </ul>
             </div>
           )}
           {report.sample.length > 0 && (
