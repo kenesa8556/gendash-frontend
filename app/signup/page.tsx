@@ -38,6 +38,10 @@ export default function Signup() {
         <button disabled={busy || !email || !password} className="w-full rounded bg-accent p-2 text-white disabled:opacity-50">
           {busy ? 'Creating…' : 'Sign up'}
         </button>
+        <p className="text-xs text-muted">
+          By signing up you agree to the <Link href="/terms" className="text-accent">Terms</Link> and the{' '}
+          <Link href="/privacy" className="text-accent">Privacy page</Link>.
+        </p>
         <p className="text-sm text-muted">
           Already have an account? <Link href="/login" className="text-accent">Sign in</Link>
         </p>
