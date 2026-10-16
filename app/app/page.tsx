@@ -2,12 +2,12 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { Bookmark, Loader2, LogOut, Trash2, Users, X } from 'lucide-react';
+import { Bookmark, Loader2, LogOut, Trash2, Users, X ,Database} from 'lucide-react';
 import { supabase } from '@/lib/supabase';
 import { useGeneration } from '@/hooks/useGeneration';
 import {
   DashboardSummary, deleteDashboard, getMe, Invitation, listDashboards, loadDashboard,
-  respondInvitation, saveDashboard,
+  respondInvitation, saveDashboard, getDataStatus
 } from '@/lib/api';
 import { SPEC_VERSION } from '@/types/spec';
 import { SpecRenderer } from '@/components/renderer/SpecRenderer';
@@ -42,6 +42,7 @@ export default function AppPage() {
   const [dismissed, setDismissed] = useState<Set<string>>(new Set());
   const [loaded, setLoaded] = useState(false);
   const pendingRefresh = useRef(false);
+    const [hasData, setHasData] = useState<boolean | null>(null);
 
   // who am I, which shops do I belong to, and do I have invitations?
   const applyMe = useCallback(async () => {
@@ -102,6 +103,13 @@ export default function AppPage() {
     setCurrent(null);
     refreshList(orgId);
   }, [orgId, refreshList]);
+
+
+    useEffect(() => {
+    if (!orgId) return;
+    setHasData(null);
+    getDataStatus(orgId).then((s) => setHasData(s.rows > 0)).catch(() => setHasData(true));
+  }, [orgId]);
 
   // after a refine finishes, the server saves the new version a moment later
   useEffect(() => {
@@ -204,6 +212,10 @@ export default function AppPage() {
             <Link href="/app/team" aria-label="Team" title="Team"
               className="rounded border border-border p-2 hover:bg-surface"><Users size={16} /></Link>
           )}
+          {orgId && (
+            <Link href="/app/data" aria-label="Data" title="Data"
+              className="rounded border border-border p-2 hover:bg-surface"><Database size={16} /></Link>
+          )}
           <button aria-label="Sign out"
             onClick={async () => { await supabase.auth.signOut(); router.replace('/login'); }}
             className="rounded border border-border p-2 hover:bg-surface"><LogOut size={16} /></button>
@@ -244,6 +256,13 @@ export default function AppPage() {
           </aside>
 
           <div className="space-y-6 min-w-0">
+              {hasData === false && (
+                  <section className="space-y-2 rounded-lg border border-border bg-surface p-4">
+                    <h2 className="font-medium">Add your sales data to get started</h2>
+                    <p className="text-sm text-muted">Upload your sales sheet, or load sample data to try GenDash first.</p>
+                    <Link href="/app/data" className="inline-block rounded bg-accent px-4 py-2 text-white">Add data</Link>
+                  </section>
+              )}
             <section className="space-y-3">
               <textarea value={question} onChange={(e) => setQuestion(e.target.value)} rows={2} maxLength={300}
                 aria-label="Your question" placeholder="Ask a question about your sales…"

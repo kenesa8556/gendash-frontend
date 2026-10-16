@@ -9,7 +9,7 @@ async function authFetch(path: string, orgId: string | null, init: RequestInit =
         headers: {
       Authorization: `Bearer ${data.session.access_token}`,
       ...(orgId ? { 'x-org-id': orgId } : {}),
-      'Content-Type': 'application/json',
+      ...(init.body instanceof FormData ? {} : { 'Content-Type': 'application/json' }),
       ...(init.headers ?? {}),
     },
   });
@@ -97,3 +97,41 @@ export const removeMember = (orgId: string, userId: string) =>
   authFetch(`/members/${userId}`, orgId, { method: 'DELETE' });
 export const respondInvitation = (id: string, accept: boolean): Promise<{ accepted: boolean; orgId?: string }> =>
   authFetch(`/invitations/${id}/respond`, null, { method: 'POST', body: JSON.stringify({ accept }) });
+
+export interface ImportPreview {
+  filename: string; headers: string[]; totalRows: number; sample: string[][];
+  mapping: Record<string, number | null>; missingRequired: string[];
+  dateOrder: 'dmy' | 'mdy'; dateOrderAmbiguous: boolean;
+}
+export interface ImportReport {
+  dryRun?: boolean; rowsTotal: number; rowsValid: number; rowsSkipped: number;
+  reasons: Record<string, number>; issues: { line: number; reason: string }[];
+  dateRange: { from: string; to: string } | null; sample: Record<string, unknown>[]; importId?: string;
+}
+export interface ImportRecord {
+  id: string; filename: string; rows_imported: number; rows_skipped: number; mode: string; created_at: string;
+}
+
+export const previewImport = (orgId: string, file: File): Promise<ImportPreview> => {
+  const f = new FormData();
+  f.append('file', file);
+  return authFetch('/imports/preview', orgId, { method: 'POST', body: f });
+};
+export const runImport = (
+  orgId: string, file: File, mapping: Record<string, number | null>,
+  o: { mode: 'append' | 'replace'; dateOrder: 'dmy' | 'mdy'; dryRun: boolean },
+): Promise<ImportReport> => {
+  const f = new FormData();
+  f.append('file', file);
+  f.append('mapping', JSON.stringify(mapping));
+  f.append('mode', o.mode);
+  f.append('dateOrder', o.dateOrder);
+  if (o.dryRun) f.append('dryRun', 'true');
+  return authFetch('/imports', orgId, { method: 'POST', body: f });
+};
+export const listImports = (orgId: string): Promise<ImportRecord[]> => authFetch('/imports', orgId);
+export const getDataStatus = (orgId: string): Promise<{ rows: number }> => authFetch('/imports/status', orgId);
+export const deleteImport = (orgId: string, id: string) =>
+  authFetch(`/imports/${id}`, orgId, { method: 'DELETE' });
+export const loadSampleData = (orgId: string): Promise<{ importId: string; rowsImported: number }> =>
+  authFetch('/imports/sample', orgId, { method: 'POST' });
