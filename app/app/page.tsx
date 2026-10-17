@@ -198,13 +198,13 @@ export default function AppPage() {
 
   return (
     <main className="min-h-screen max-w-6xl mx-auto p-4 md:p-8 space-y-6">
-      <header className="flex items-center justify-between gap-3">
-        <h1 className="text-xl font-semibold">GenDash</h1>
-        <div className="flex items-center gap-2">
-          {orgs.length > 0 && (
+       <header className="flex flex-wrap items-center justify-between gap-3">
+          <h1 className="text-xl font-semibold">GenDash</h1>
+          <div className="flex min-w-0 flex-wrap items-center gap-2">
+            {orgs.length > 0 && (
             <select value={orgId} aria-label="Organization"
               onChange={(e) => { setOrgId(e.target.value); localStorage.setItem('gendash.org', e.target.value); }}
-              className="rounded border border-border bg-surface px-2 py-1.5 text-sm">
+              className="max-w-[11rem] truncate rounded border border-border bg-surface px-2 py-1.5 text-sm">
               {orgs.map((o) => <option key={o.id} value={o.id}>{o.name}</option>)}
             </select>
           )}
@@ -235,8 +235,8 @@ export default function AppPage() {
       )}
 
       {orgId && (
-        <div className="grid gap-6 md:grid-cols-[16rem_1fr]">
-          <aside aria-label="Saved dashboards" className="space-y-2">
+        <div className="grid grid-cols-1 gap-6 md:grid-cols-[16rem_1fr]">
+          <aside aria-label="Saved dashboards" className="order-2 min-w-0 space-y-2 md:order-1">
             <h2 className="text-sm font-medium text-muted">Saved dashboards</h2>
             {saved.length === 0 && <p className="text-xs text-muted">Nothing saved yet.</p>}
             <ul className="space-y-1">
@@ -255,7 +255,7 @@ export default function AppPage() {
             </ul>
           </aside>
 
-          <div className="space-y-6 min-w-0">
+          <div className="order-1 min-w-0 space-y-6 md:order-2">
               {hasData === false && (
                   <section className="space-y-2 rounded-lg border border-border bg-surface p-4">
                     <h2 className="font-medium">Add your sales data to get started</h2>
@@ -279,7 +279,7 @@ export default function AppPage() {
                     <X size={16} /> Cancel
                   </button>
                 )}
-                <div className="flex flex-wrap gap-2 ml-auto">
+                <div className="flex flex-wrap gap-2 sm:ml-auto">
                   {EXAMPLES.slice(1).map((ex) => (
                     <button key={ex} onClick={() => setQuestion(ex)}
                       className="rounded-full border border-border px-3 py-1 text-xs text-muted hover:text-text hover:bg-surface">

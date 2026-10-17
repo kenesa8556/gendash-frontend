@@ -19,8 +19,8 @@
   --font-sans: 'Inter Variable', system-ui, sans-serif;
   --font-mono: 'JetBrains Mono Variable', ui-monospace, monospace;
 }
-
-html, body { background: var(--color-bg); color: var(--color-text); }
+img, svg, video { max-width: 100%; height: auto; }
+html, body { background: var(--color-bg); color: var(--color-text); overflow-wrap: break-word; }
 :focus-visible {
   outline: 2px solid var(--color-accent);
   outline-offset: 2px;

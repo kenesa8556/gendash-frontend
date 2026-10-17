@@ -9,12 +9,12 @@ import { compact, formatValue } from '@/lib/format';
 export function BarChartPanel({ panel, rows }: { panel: SpecPanel; rows: Row[] }) {
   const { data, keys } = toChartData(rows, panel.partialLastPeriod);
   return (
-    <div role="img" aria-label={panel.label} className="h-64 w-full">
+    <div role="img" aria-label={panel.label} className="h-64 w-full min-w-0">
       <ResponsiveContainer width="100%" height="100%">
         <BarChart data={data} margin={{ top: 8, right: 12, left: 0, bottom: 0 }}>
           <CartesianGrid stroke="var(--color-border)" strokeDasharray="3 3" />
-          <XAxis dataKey="dim" stroke="var(--color-muted)" tick={{ fontSize: 12 }} />
-          <YAxis stroke="var(--color-muted)" tick={{ fontSize: 12 }} width={48}
+          <XAxis dataKey="dim" stroke="var(--color-muted)"  minTickGap={16} tick={{ fontSize: 12 }} />
+          <YAxis stroke="var(--color-muted)" tick={{ fontSize: 12 }} width={44}
             tickFormatter={(v) => compact(Number(v))} />
           <Tooltip
             cursor={{ fill: 'var(--color-surface-2)' }}

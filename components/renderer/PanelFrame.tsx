@@ -7,8 +7,8 @@ export function PanelFrame({ panel, children, onShowData }: {
   return (
     <section aria-label={panel.label}
       className="rounded-lg border border-border bg-surface p-4 flex flex-col gap-3">
-      <header className="flex items-start justify-between gap-2">
-        <h3 className="text-sm font-medium">{panel.label}</h3>
+     <header className="flex flex-wrap items-start justify-between gap-2">
+        <h3 className="min-w-0 break-words text-sm font-medium">{panel.label}</h3>
         <div className="flex shrink-0 items-center gap-2">
           {panel.partialLastPeriod && (
             <span className="rounded bg-warn/20 px-2 py-0.5 text-xs text-warn">partial month</span>

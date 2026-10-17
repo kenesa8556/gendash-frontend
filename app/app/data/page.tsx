@@ -119,7 +119,7 @@ export default function DataPage() {
           <ul className="divide-y divide-border rounded-lg border border-border">
             {imports.map((i) => (
               <li key={i.id} className="flex flex-wrap items-center gap-3 p-3 text-sm">
-                <span className="min-w-0 flex-1 truncate">
+                <span className="min-w-0 flex-1 break-words">
                   {i.filename}
                   <span className="ml-2 text-xs text-muted">
                     {i.rows_imported} rows{i.rows_skipped > 0 ? `, ${i.rows_skipped} skipped` : ''} · {i.mode} · {new Date(i.created_at).toLocaleString()}

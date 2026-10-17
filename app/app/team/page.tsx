@@ -111,7 +111,7 @@ export default function TeamPage() {
             const me = m.user_id === myId;
             return (
               <li key={m.user_id} className="flex flex-wrap items-center gap-3 p-3 text-sm">
-                <span className="min-w-0 flex-1 truncate">{m.email}{me && <span className="ml-2 text-xs text-muted">(you)</span>}</span>
+                <span className="min-w-0 flex-1 basis-48 break-all">{m.email}{me && <span className="ml-2 text-xs text-muted">(you)</span>}</span>
                 {isOwner && !me ? (
                   <select value={m.role} disabled={busy} aria-label={`Role of ${m.email}`}
                     onChange={(e) => act(() => setMemberRole(orgId, m.user_id, e.target.value as 'owner' | 'member'))}
@@ -142,10 +142,10 @@ export default function TeamPage() {
         <>
           <section className="space-y-2">
             <h2 className="text-sm font-medium text-muted">Invite someone</h2>
-            <form onSubmit={invite} className="flex gap-2">
+            <form onSubmit={invite} className="flex flex-col gap-2 sm:flex-row">
               <input type="email" value={email} onChange={(e) => setEmail(e.target.value)} maxLength={120}
                 placeholder="their email address" aria-label="Email address to invite"
-                className="flex-1 rounded border border-border bg-surface p-2 focus:outline-none focus:border-accent" />
+                className="flex-1 rounded border border-border min-w-0 w-full bg-surface p-2 focus:outline-none focus:border-accent" />
               <button disabled={busy || !email.trim()} className="rounded bg-accent px-4 py-2 text-white disabled:opacity-50">
                 Invite
               </button>
@@ -161,7 +161,7 @@ export default function TeamPage() {
             <ul className="divide-y divide-border rounded-lg border border-border">
               {sent.map((s) => (
                 <li key={s.id} className="flex flex-wrap items-center gap-3 p-3 text-sm">
-                  <span className="min-w-0 flex-1 truncate">{s.email}</span>
+                  <span className="min-w-0 flex-1 basis-48 break-all">{s.email}</span>
                   <span className={`rounded px-2 py-0.5 text-xs ${s.status === 'pending' ? 'bg-warn/20 text-warn' : 'bg-surface-2'}`}>
                     {s.status}
                   </span>
