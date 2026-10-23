@@ -21,20 +21,49 @@ export default function Login() {
     else router.push('/app');
   }
 
+  const input =
+    'w-full rounded bg-bg border border-border p-2 text-text placeholder:text-muted';
+
   return (
-    <main className="min-h-screen bg-neutral-950 text-neutral-100 flex items-center justify-center p-4">
-      <form onSubmit={submit} className="w-full max-w-sm space-y-3 rounded-lg border border-neutral-800 p-6">
+    <main className="min-h-screen bg-bg text-text flex items-center justify-center p-4">
+      <form
+        onSubmit={submit}
+        className="w-full max-w-sm space-y-3 rounded-lg border border-border bg-surface p-6"
+      >
         <h1 className="text-xl font-semibold">GenDash</h1>
-        <input className="w-full rounded bg-neutral-900 border border-neutral-700 p-2" placeholder="Email"
-          value={email} onChange={(e) => setEmail(e.target.value)} />
-        <input className="w-full rounded bg-neutral-900 border border-neutral-700 p-2" placeholder="Password"
-          type="password" value={password} onChange={(e) => setPassword(e.target.value)} />
-        {err && <p className="text-sm text-red-400">{err}</p>}
-        <button disabled={busy} className="w-full rounded bg-blue-600 p-2 disabled:opacity-50">
+        <input
+          className={input}
+          type="email"
+          autoComplete="email"
+          aria-label="Email"
+          placeholder="Email"
+          required
+          value={email}
+          onChange={(e) => setEmail(e.target.value)}
+        />
+        <input
+          className={input}
+          type="password"
+          autoComplete="current-password"
+          aria-label="Password"
+          placeholder="Password"
+          required
+          value={password}
+          onChange={(e) => setPassword(e.target.value)}
+        />
+        {err && <p className="text-sm text-danger">{err}</p>}
+        <button
+          disabled={busy}
+          className="w-full rounded bg-accent p-2 font-medium text-white disabled:opacity-50"
+        >
           {busy ? 'Signing in…' : 'Sign in'}
         </button>
-
-        <p className="text-sm text-muted">New here? <Link href="/signup" className="text-accent">Create an account</Link></p>
+        <p className="text-sm text-muted">
+          New here?{' '}
+          <Link href="/signup" className="text-accent">
+            Create an account
+          </Link>
+        </p>
       </form>
     </main>
   );
